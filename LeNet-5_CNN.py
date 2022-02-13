@@ -54,7 +54,7 @@ for dir in dirs:
         # imageArr.append(np.asarray(image))
 
         # resize image and ignore original aspect ratio
-        img_resized = image.resize((25,25   ))
+        img_resized = image.resize((25,25))
         imageArr.append(np.asarray(img_resized))
 
 
@@ -130,6 +130,8 @@ tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
 
 
 model.fit(train_generator, steps_per_epoch=steps_per_epoch, epochs=EPOCHS, validation_data=validation_generator, validation_steps=validation_steps, shuffle=True, callbacks=[tensorboard])
+
+# 
 
 
 score = model.evaluate(test['features'], to_categorical(test['labels']))
