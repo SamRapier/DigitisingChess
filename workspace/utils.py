@@ -34,8 +34,6 @@ def compareNeighbours(matrix, x, y, radius = 3):
     return True
 
 
-
-
 def getLineBestFit(yRange, arrGradient):
 	m = 0
 	c = 0
@@ -53,8 +51,6 @@ def getLineBestFit(yRange, arrGradient):
 			xArr[j].append((i - c)/m)
 
 	return (xArr, yArr)
-
-
 
 
 def drawLinesOntop(image, arrGradient, arrLines):
