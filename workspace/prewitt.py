@@ -35,7 +35,7 @@ def prewitt(image):
     prewitt_Y = directionalPrewitt(image, kernelArr_Y)
 
     img_prewitt = np.hypot(prewitt_X, prewitt_Y)
-    img_prewitt = (img_prewitt / img_prewitt.max() * 255).astype('unit8')
+    img_prewitt = (img_prewitt / img_prewitt.max() * 255).astype('uint8')
 
     theta = np.arctan2(prewitt_Y, prewitt_X).astype('uint8')
 

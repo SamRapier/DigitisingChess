@@ -12,7 +12,7 @@ def loadImg(filename):
 
 def grayScale(image):
 	"""Apply gray scaling to image"""
-	return cv2.cvtColor(image, cv2.COLOR_BG2GRAY)
+	return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 def blurImage(image):
 	"""Add Gaussian Blur to image"""
@@ -48,7 +48,6 @@ def image_transform(img, points, square_length=150):
 	M = cv2.getPerspectiveTransform(pts1, pts2)
 	W = cv2.warpPerspective(img, M, (board_length, board_length))
 	return W
-
 
 
 class ImageObject(object):

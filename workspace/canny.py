@@ -63,7 +63,7 @@ def threshold(img, lowThresholdRatio=0.05, highThresholdRatio=0.09):
     return (res, weak, strong)
 
 
-def canny(img, theta):
+def cannyAlgo(img, theta):
     res = non_max_suppression(img, theta)
     res, weak, strong = threshold(res)
     return res

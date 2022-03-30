@@ -1,39 +1,88 @@
 from skimage.transform import radon, iradon
 import numpy as np
-import cv2
+import utils
 
 def calcTheta(image):
-    return np.linspace(0., 360., max(image.shape), endpoint=False)
+	return np.linspace(0., 360., max(image.shape), endpoint=False)
 
 def radonTransform(image):
-    return radon(image, theta=calcTheta(image), circle=False)
+	return radon(image, theta=calcTheta(image), circle=False)
 
 def filteredBackProjection(sinogram, _theta):
-    # theta = np.linspace(0., 360., max(image.shape), endpoint=False)
-    return iradon(sinogram, theta=_theta, filter_name='cosine', circle=False)
+	# theta = np.linspace(0., 360., max(image.shape), endpoint=False)
+	return iradon(sinogram, theta=_theta, filter_name='cosine', circle=False)
 
 
 
 def collectPeakPoints(sinogram):
 
-    points = []
+	points = []
 
-    for i in range(len(sinogram)):
-        for j in range(len(sinogram[0])):
-            if sinogram[i][j] > 254:
-                points.append([j,i])
+	for i in range(len(sinogram)):
+		for j in range(len(sinogram[0])):
+			if sinogram[i][j] > 254:
+				points.append([j,i])
 
-    points2 = sorted(points, key=lambda x: x[0])
+	points2 = sorted(points, key=lambda x: x[0])
 
-    points_limited = []
-    for i in range(len(points2)):
-        if points2[i][1] > 200 and points2[i][1] < 700:
-            points_limited.append(points2[i])
+	points_limited = []
+	for i in range(len(points2)):
+		if points2[i][1] > 200 and points2[i][1] < 700:
+			points_limited.append(points2[i])
 
-    return points_limited
+	return points_limited
+
+
+def lineOfBestFit(sinogram):
+	prevX = 0
+	count = 0
+
+	_points = collectPeakPoints(sinogram)
+
+	# colorArr = ['red', 'orange', 'green', 'blue', 'purple', 'yellow', 'black', 'pink']
+	lineArr = []
+	gradientsArr = []
+	xArr = np.array([])
+	yArr = np.array([])
+	(x,y) = _points[0]
+
+	counter = 0
+	while counter < len(_points):
+		while x < (prevX+40):
+			prevX = x
+
+			xArr = np.append(xArr, x)
+			yArr = np.append(yArr, y)
+			
+			counter += 1
+
+			if counter > (len(_points)-1):
+				break
+
+			(x,y) = _points[counter]
+
+		prevX = x
+		# get gradient and y-intercept for line of best fit
+		m, b = np.polyfit(xArr, yArr, 1)
+		gradientsArr.append([m,b])
+
+		# # plot points and lines
+		# plt.plot(xArr, m*xArr + b, c=colorArr[count])
+		# plt.plot(xArr, yArr, '.', c=colorArr[count])
+
+		lineArr.append([xArr, yArr])
+		xArr = np.array([])
+		yArr = np.array([])
+
+		count+= 1        
+		if count > 7:
+			count = 0
+	
+	return gradientsArr, lineArr
+
 
 def applyBoundaries(image, arrGradient, arrLines, padding):
-	xArr, yArr = getLineBestFit(image.shape[0], arrGradient, arrLines)
+	xArr, _ = utils.getLineBestFit(image.shape[0], arrGradient, arrLines)
 	newImage = np.zeros(image.shape, image.dtype)
 
 	for j in range(image.shape[0]):
@@ -52,15 +101,23 @@ def applyBoundaries(image, arrGradient, arrLines, padding):
 
 	return newImage			
 
+def withinBounds(x, y):
+		if (x > 300 and y > 200) and (x < 550 and y < 800):
+			return True
+		else:
+			return False 
 
-def calcSecondDeriv():
+def getX(y, m, c):
+		return (y-c) / m
+
+def calcSecondDeriv(image):
 	# betterSecondDeriv
 	# take the lowest y and x coord that sits on the green and red line
 
 	# use equation of green and red line to find x coord at lowest and max height
 	# set value of points outside these bounds to zero
 
-	secDerivExtract = np.zeros(betterSecondDeriv.shape)
+	secDerivExtract = np.zeros(image.shape)
 
 	m = 0
 	c = 0
@@ -72,32 +129,9 @@ def calcSecondDeriv():
 	yMin = 200
 	yMax = 800
 
-	# plt.imshow(image, cmap=plt.cm.Greys_r, aspect='auto')
-	# plt.imshow(bestLinePoints,'gray',vmin=0,vmax=255, aspect='auto')
+	for i in range(len(image)):
+		for j in range(len(image[0])):
+			if withinBounds(j, i):
+				secDerivExtract[i][j] = image[i][j]
 
-	def getX(y, m, c):
-	return (y-c) / m
-
-	def withinBounds(x, y):
-	#   xMin_1 = getX(yMax, gradientsArr[2][0], gradientsArr[2][1])
-	#   xMax_1 = getX(yMax, gradientsArr[2][0], gradientsArr[2][1])
-	#   xMin_2 = getX(yMax, gradientsArr[3][0], gradientsArr[3][1])
-	#   xMax_2 = getX(yMax, gradientsArr[3][0], gradientsArr[3][1])
-
-	if (x > 300 and y > 200) and (x < 550 and y < 800):
-		return True
-	else:
-		return False 
-
-	# for (x,y) in betterSecondDeriv:
-
-	print("i: 0-", len(betterSecondDeriv))
-	print("j: 0-", len(betterSecondDeriv[0]))
-
-	for i in range(len(betterSecondDeriv)):
-	for j in range(len(betterSecondDeriv[0])):
-		if withinBounds(j, i):
-		secDerivExtract[i][j] = betterSecondDeriv[i][j]
-
-	print(len(secDerivExtract))
-
+	return secDerivExtract

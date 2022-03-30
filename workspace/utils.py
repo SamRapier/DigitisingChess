@@ -1,6 +1,7 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import radon
 
 
 def applySimpleThreshold(image, threshVal, thresholdType):
@@ -9,6 +10,7 @@ def applySimpleThreshold(image, threshVal, thresholdType):
 
 def displayImage(image):
     plt.imshow(image, cmap=plt.cm.Greys_r, aspect='auto')
+    plt.show()
 
 
 def findPeaks(matrix):
@@ -30,55 +32,6 @@ def compareNeighbours(matrix, x, y, radius = 3):
             return False
                        
     return True
-
-
-def lineOfBestFit(sinogram):
-    prevX = 0
-    count = 0
-
-    _points = collectPeakPoints
-
-    # colorArr = ['red', 'orange', 'green', 'blue', 'purple', 'yellow', 'black', 'pink']
-    lineArr = []
-    gradientsArr = []
-    xArr = np.array([])
-    yArr = np.array([])
-    (x,y) = _points[0]
-
-    counter = 0
-    while counter < len(_points):
-        while x < (prevX+40):
-            prevX = x
-
-            xArr = np.append(xArr, x)
-            yArr = np.append(yArr, y)
-            
-            counter += 1
-
-            if counter > (len(_points)-1):
-                break
-
-            (x,y) = _points[counter]
-
-        prevX = x
-        # get gradient and y-intercept for line of best fit
-        m, b = np.polyfit(xArr, yArr, 1)
-        gradientsArr.append([m,b])
-
-        # # plot points and lines
-        # plt.plot(xArr, m*xArr + b, c=colorArr[count])
-        # plt.plot(xArr, yArr, '.', c=colorArr[count])
-
-        lineArr.append([xArr, yArr])
-        xArr = np.array([])
-        yArr = np.array([])
-
-        count+= 1        
-        if count > 7:
-            count = 0
-    
-    return gradientsArr, lineArr
-
 
 
 
