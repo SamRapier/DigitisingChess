@@ -5,33 +5,33 @@ import radon
 
 
 def applySimpleThreshold(image, threshVal, thresholdType):
-    ret,simple_threshold = cv2.threshold(image, threshVal, 255, thresholdType)
-    return simple_threshold
+	ret,simple_threshold = cv2.threshold(image, threshVal, 255, thresholdType)
+	return simple_threshold
 
 def displayImage(image):
-    plt.imshow(image, cmap=plt.cm.Greys_r, aspect='auto')
-    plt.show()
+	plt.imshow(image, cmap=plt.cm.Greys_r, aspect='auto')
+	plt.show()
 
 
 def findPeaks(matrix):
-    localPeaks = []
+	localPeaks = []
 
-    for i in range(1, (len(matrix) -1)):
-        for j in range(1, (len(matrix[0]) -1)):        
-            # for each element, if it is greater than all its neighbours, add it to list
+	for i in range(1, (len(matrix) -1)):
+		for j in range(1, (len(matrix[0]) -1)):        
+			# for each element, if it is greater than all its neighbours, add it to list
 
-            # check vertical neighbours first
-            if (compareNeighbours(matrix, i, j, 3)):
-                localPeaks.append([j,i])
+			# check vertical neighbours first
+			if (compareNeighbours(matrix, i, j, 3)):
+				localPeaks.append([j,i])
 
-    return localPeaks
+	return localPeaks
 
 def compareNeighbours(matrix, x, y, radius = 3):
-    for i in range(1, radius+1):
-        if not ((matrix[x][y] > matrix[x][y+i]) and (matrix[x][y] > matrix[x][y-i]) and (matrix[x][y] > matrix[x+i][y]) and (matrix[x][y] > matrix[x-i][y]) and (matrix[x][y] > matrix[x+i][y+i]) and (matrix[x][y] > matrix[x-i][y+i]) and (matrix[x][y] > matrix[x-i][y-i])and (matrix[x][y] > matrix[x+i][y-i])):
-            return False
-                       
-    return True
+	for i in range(1, radius+1):
+		if not ((matrix[x][y] > matrix[x][y+i]) and (matrix[x][y] > matrix[x][y-i]) and (matrix[x][y] > matrix[x+i][y]) and (matrix[x][y] > matrix[x-i][y]) and (matrix[x][y] > matrix[x+i][y+i]) and (matrix[x][y] > matrix[x-i][y+i]) and (matrix[x][y] > matrix[x-i][y-i])and (matrix[x][y] > matrix[x+i][y-i])):
+			return False
+					   
+	return True
 
 
 def getLineBestFit(yRange, arrGradient):
@@ -66,3 +66,25 @@ def drawLinesOntop(image, arrGradient, arrLines):
 
 
 	plt.show()
+
+
+def buildNumpyArray(points, image):
+	newArrShape = image.shape
+	arr = np.zeros(newArrShape)
+
+	for (i, j) in points:
+		_i, _j = int(i), int(j)
+		if (_i > 0 and _i < newArrShape[0]) and (_j > 0 and _j < newArrShape[1]):
+			arr[_i][_j] = 255
+
+	return arr
+
+
+def padToSquare(image):
+	currSize = image.shape
+	diameter = np.sqrt((currSize[0]**2) + (currSize[1]**2))
+	# radius = diameter/2
+	padding_0 = int((diameter - currSize[0]) / 2)
+	padding_1 = int((diameter - currSize[1]) / 2)
+	
+	return np.pad(image, [(padding_0,padding_0), (padding_1,padding_1)], mode='constant') 

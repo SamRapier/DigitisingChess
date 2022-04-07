@@ -25,7 +25,7 @@ def image_resize(img, height=500):
 	shape[0] *= scale; shape[1] *= scale
 	img = cv2.resize(img, (int(shape[1]), int(shape[0])))
 	img_shape = np.shape(img)
-	return img, img_shape, scale
+	return img
 
 def image_scale(pts, scale):
 	"""scale to original image size"""

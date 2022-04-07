@@ -81,8 +81,8 @@ def lineOfBestFit(sinogram):
 	return gradientsArr, lineArr
 
 
-def applyBoundaries(image, arrGradient, arrLines, padding):
-	xArr, _ = utils.getLineBestFit(image.shape[0], arrGradient, arrLines)
+def applyBoundaries(image, arrGradient, padding):
+	xArr, _ = utils.getLineBestFit(image.shape[0], arrGradient)
 	newImage = np.zeros(image.shape, image.dtype)
 
 	for j in range(image.shape[0]):
@@ -99,7 +99,27 @@ def applyBoundaries(image, arrGradient, arrLines, padding):
 			# if (x > xArr[2][x] and x < xArr[3][x]):
 			# 	newImage[y][x] = image[y][x]	
 
-	return newImage			
+	return newImage		
+
+
+def getPointsOnLine(image, arrGradient, padding):
+	xArr, _ = utils.getLineBestFit(image.shape[0], arrGradient)
+	newImage = np.zeros(image.shape, image.dtype)
+
+	for j in range(image.shape[0]):
+		for i in range(image.shape[1]):
+			
+			# i is essentially y-1
+			# if i == 180:
+				# print(i)
+			if ((i > (xArr[1][j] + padding)) and (i < xArr[3][j] + (padding+1))):
+				newImage[j][i] = image[j][i]	
+
+			# if (x > (lineArr[1][i] + padding) and x < (xArr[y][x] - padding)):
+
+			# if (x > xArr[2][x] and x < xArr[3][x]):
+			# 	newImage[y][x] = image[y][x]		
+	return newImage
 
 def withinBounds(x, y):
 		if (x > 300 and y > 200) and (x < 550 and y < 800):
@@ -117,21 +137,35 @@ def calcSecondDeriv(image):
 	# use equation of green and red line to find x coord at lowest and max height
 	# set value of points outside these bounds to zero
 
-	secDerivExtract = np.zeros(image.shape)
+# 
+	# secDerivExtract = np.zeros(image.shape)
 
-	m = 0
-	c = 0
-	xMin_1 = 0
-	xMin_2 = 0
-	xMax_1 = 0
-	xMax_2 = 0
+	# for i in range(len(image)):
+	# 	for j in range(len(image[0])):
+	# 		if withinBounds(j, i):
+	# 			secDerivExtract[i][j] = image[i][j]
 
-	yMin = 200
-	yMax = 800
+	gradientArr, _ = lineOfBestFit(image)
+	secDerivExtract = getPointsOnLine(image, gradientArr, padding=20)
 
-	for i in range(len(image)):
-		for j in range(len(image[0])):
-			if withinBounds(j, i):
-				secDerivExtract[i][j] = image[i][j]
 
 	return secDerivExtract
+
+
+# def getLineBestFit(yRange, arrGradient, arrLines):
+# 	m = 0
+# 	c = 0
+# 	xArr = []
+# 	yArr = []
+	
+
+# 	for i in range(yRange):
+# 		yArr.append(i)
+
+# 	for j in range(len(arrGradient)):
+# 		m,c = arrGradient[j]
+# 		xArr.append([])
+# 		for i in range(yRange):
+# 			xArr[j].append((i - c)/m)
+
+# 	return (xArr, yArr)
