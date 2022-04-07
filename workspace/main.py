@@ -62,11 +62,12 @@ if __name__ == "__main__":
     debug.image(gridLayout.astype('uint8')).points(points, size=3).save("laps_in_queue")
     debug.image(paddedImg.astype('uint8')).points(points, size=3).save("intersections_on_testImg")
 
+    points2 = intersection_detector.detectBestIntersections(paddedImg.astype('uint8'), points, 10)
 
     # may need to scale intersections to plot them back onto original image rather than gridLayout
 
     # convert points back to a numpy array and then perform a radon transform on this
-    pointsImg = utils.buildNumpyArray(points, gridLayout)
+    pointsImg = utils.buildNumpyArray(points2, gridLayout)
 
     # perform radon transform on pointsImg
     intersection_Rspace = radonTransform(pointsImg)

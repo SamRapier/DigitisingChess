@@ -1,6 +1,6 @@
 import bentley_ottmann
 import debug
-import scipy
+import scipy, scipy.cluster
 import cv2
 import numpy as np
 import collections
@@ -19,7 +19,7 @@ def intersections(lines):
 	return bentley_ottmann.isect_segments(__lines)
 
 
-def detectBestIntersections(img, __points, size):
+def detectBestIntersections(img, __points, size=10):
 	points = []
 
 	for pt in __points:
@@ -55,6 +55,8 @@ def detectBestIntersections(img, __points, size):
 	debug.image(img).points(points, size=5, \
 		color=debug.color()).save("laps_good_points")
 
+	return points
+
 
 def laps_cluster(points, max_dist=10):
 	"""cluster very similar points"""
@@ -75,7 +77,7 @@ def laps_detector(img):
 
 	hashid = str(hash(img.tostring()))
 
-	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	# img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
 	img = cv2.Canny(img, 0, 255)	
 	img = cv2.resize(img, (21, 21), interpolation=cv2.INTER_CUBIC)
@@ -112,8 +114,8 @@ def laps_detector(img):
 
 	# decision
 	if t:
-		#debug.image(imgd).save("OK" + str(hash(str(imgd))), prefix=False)
+		debug.image(imgd).save("OK" + str(hash(str(imgd))), prefix=False)
 		return (True, pred[0])
 	else:
-		#debug.image(imgd).save("NO" + str(hash(str(imgd))), prefix=False)
+		# debug.image(imgd).save("NO" + str(hash(str(imgd))), prefix=False)
 		return (False, pred[0])
