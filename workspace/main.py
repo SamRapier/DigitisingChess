@@ -26,9 +26,7 @@ if __name__ == "__main__":
 
     img_canny = cannyAlgo(img_prewitt, theta)
     debug.image(img_canny.astype('uint8')).save("canny_transform")
-
-
-
+    
 
     sinogram = radonTransform(img_canny)
     debug.image(sinogram.astype('uint8')).save("sinogram")
